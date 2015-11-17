@@ -12,28 +12,30 @@ namespace DangerAlerts
 {
     class AlertSoundPlayer
     {
-        AudioClip currentClip;
-        public GameObject dangeralertplayer = new GameObject("dangeralertplayer");
-        public AudioSource source;
-        public void PlaySound(string soundPath, Vessel vessel)
+        public GameObject dangeralertplayer = new GameObject("dangeralertplayer"); //Makes the GameObject
+        public AudioSource source; //The source to be added to the object
+        public AudioClip loadedClip;
+
+        public void PlaySound(Vessel vessel)
         {
             Debug.Log("[DNGRALT] Starting to play alarm");
-            currentClip = GameDatabase.Instance.GetAudioClip(soundPath);
-            Debug.Log("[DNGRALT] Did file stuff.");
-            source.audio.clip = currentClip;
+            
+            source.audio.clip = loadedClip;
             source.audio.Play();
             Debug.Log("[DNGRALT] ...Finished");
         }
-        public void Initialize()
+        public void Initialize(string soundPath)
         {
             //Initializing stuff;
             dangeralertplayer = new GameObject("dangeralertplayer");
             source = dangeralertplayer.AddComponent<AudioSource>();
-            
-            source.volume = 1;
+            loadedClip = GameDatabase.Instance.GetAudioClip(soundPath);
+            Debug.Log("[DNGRALT] Did file stuff.");
+
+            source.volume = 0.5f; //Volume can be changed, and probably should be. Add toolbar volume slider? TODO
             Debug.Log("Initialized Danger Alert Player");
         }
-        public void MovePlayer(Vessel vessel)
+        public void MovePlayer(Vessel vessel) //Moves the player, maaaaybe not needed?
         {
             dangeralertplayer.transform.parent = vessel.gameObject.transform;
             dangeralertplayer.transform.localPosition = new Vector3(0, 0, 0);
