@@ -18,7 +18,7 @@ namespace DangerAlerts
     {
         private string normalAlert = "DangerAlerts/Sounds/normalAlert";
         AlertSoundPlayer soundplayer = new AlertSoundPlayer();
-        private int minimumSpeed = -10; //The alarm will only go off if the speed goes below this
+        private int minimumSpeed = 10; //The alarm will only go off if the speed goes above this
                                         //so you don't get an alarm while on the launchpad
 
         private int distanceTolerance = 7; //Multiplies the current speed to match with the height
@@ -34,10 +34,13 @@ namespace DangerAlerts
 
         bool InDangerOfCrashing() // Returns a value.
         {
-            if (!FlightGlobals.ActiveVessel.Landed) //The ship probably isn't in danger of crashing if it's landed
+            Vessel currentVessel = FlightGlobals.ActiveVessel;
+            if (!currentVessel.Landed && 
+                !currentVessel.situation.Equals(Vessel.Situations.PRELAUNCH)
+                && !currentVessel.situation.Equals(Vessel.Situations.ORBITING)) //The ship probably isn't in danger of crashing if it's landed
             {
-                if ((Math.Abs(FlightGlobals.ActiveVessel.verticalSpeed)) * distanceTolerance > FlightGlobals.ActiveVessel.heightFromTerrain &&
-                    FlightGlobals.ActiveVessel.verticalSpeed < minimumSpeed) // Does fancy math, only "if ship is crashing"
+                if (Math.Abs(currentVessel.verticalSpeed) * distanceTolerance > currentVessel.heightFromTerrain &&
+                    Math.Abs(currentVessel.srfSpeed) > minimumSpeed) // Does fancy math, only "if ship is crashing"
                 {
                     return true; //...I'm in danger!
                 }
@@ -63,9 +66,11 @@ namespace DangerAlerts
             {
                 if (!alarmActive)
                 {
-                    Debug.Log("[DNGRALT] You're in danger, playing alert sound");
-                    soundplayer.PlaySound(FlightGlobals.ActiveVessel);
                     alarmActive = true;
+                }
+                if (!soundplayer.SoundPlaying())
+                {
+                    soundplayer.PlaySound(FlightGlobals.ActiveVessel);
                 }
             }
             else

@@ -24,6 +24,17 @@ namespace DangerAlerts
             source.audio.Play();
             Debug.Log("[DNGRALT] ...Finished");
         }
+        public bool SoundPlaying() //Returns true if sound is playing, otherwise false
+        {
+            if (source != null)
+            {
+                return source.isPlaying;
+            }
+            else
+            {
+                return false;
+            }
+        }
         public void Initialize(string soundPath)
         {
             //Initializing stuff;
