@@ -21,6 +21,8 @@ namespace DangerAlerts
         private int minimumSpeed = 10; //The alarm will only go off if the speed goes above this
                                         //so you don't get an alarm while on the launchpad
 
+        public int MinimumVerticalSpeed = 3; //
+
         private int distanceTolerance = 7; //Multiplies the current speed to match with the height
         public bool alarmActive = false;
         void Start()
@@ -39,8 +41,9 @@ namespace DangerAlerts
                 !currentVessel.situation.Equals(Vessel.Situations.PRELAUNCH)
                 && !currentVessel.situation.Equals(Vessel.Situations.ORBITING)) //The ship probably isn't in danger of crashing if it's landed
             {
-                if (Math.Abs(currentVessel.verticalSpeed) * distanceTolerance > currentVessel.heightFromTerrain &&
-                    Math.Abs(currentVessel.srfSpeed) > minimumSpeed) // Does fancy math, only "if ship is crashing"
+                if ((Math.Abs(currentVessel.verticalSpeed) * distanceTolerance) > currentVessel.heightFromTerrain &&
+                    Math.Abs(currentVessel.srfSpeed) > minimumSpeed && 
+                    currentVessel.verticalSpeed < MinimumVerticalSpeed) // Does fancy math, only "if ship is crashing"
                 {
                     return true; //...I'm in danger!
                 }
@@ -52,16 +55,6 @@ namespace DangerAlerts
 
         void Update()
         {
-            #if DEBUG
-            if (Input.GetKeyDown(KeyCode.Backspace)) // DEBUG FUNCTION
-            {
-                Debug.Log("[DNGRALT] Yo, i'm still here!");
-            }
-            #endif
-            if (HighLogic.LoadedSceneIsFlight)
-            {
-                //Remove the class, may not be needed
-            }
             if (InDangerOfCrashing())
             {
                 if (!alarmActive)
@@ -75,7 +68,11 @@ namespace DangerAlerts
             }
             else
             {
-                alarmActive = false;
+                if (alarmActive)
+                {
+                    alarmActive = false;
+                    soundplayer.StopSound();
+                }
             }
         }
     }

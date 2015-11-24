@@ -24,6 +24,10 @@ namespace DangerAlerts
             source.audio.Play();
             Debug.Log("[DNGRALT] ...Finished");
         }
+        public void StopSound()
+        {
+            source.audio.Stop();
+        }
         public bool SoundPlaying() //Returns true if sound is playing, otherwise false
         {
             if (source != null)
