@@ -1,6 +1,5 @@
-﻿// DangerAlerts v0.1pancake: A KSP mod. Public domain, do whatever you want, man.
-
-// #define DEBUG
+﻿// DangerAlerts v1.0.0: A KSP mod. Public domain, do whatever you want, man.
+// Author: SpaceIsBig42/Norpo (same person)
 
 using System;
 using System.Collections.Generic;
@@ -31,13 +30,12 @@ namespace DangerAlerts
 
         void Start()
         {
-            Debug.Log("Danger Alerts started."); //Lets the user know the add-on was started, DEBUG
+            Debug.Log("[DNGRALT] Danger Alerts started."); //Lets the user know the add-on was started, DEBUG
             Debug.Log("[DNGRALT] Sound file exists: " + GameDatabase.Instance.ExistsAudioClip(normalAlert));
             soundplayer.Initialize(normalAlert); // Initializes the player, does some housekeeping
             soundplayer.MovePlayer(FlightGlobals.ActiveVessel); //Moves the player to active vessel, hopefully shouldn't be needed
 
             dangerAlertGui = gameObject.AddComponent<DangerAlertGUI>();
-            dangerAlertGui.Ping(); //TEMPORARY DEBUG DON'T IGNORE THIS WARNING FUTURE ME
         }
 
         bool InDangerOfCrashing() // Returns a value.
@@ -88,7 +86,7 @@ namespace DangerAlerts
 
         void OnDestroy()
         {
-            Destroy(dangerAlertGui); //Cleaning, cleaning, oh what fun is cleaning! (otherwise you get LOADS of buttons)
+            Destroy(dangerAlertGui); //Cleaning, cleaning, oh what fun is cleaning! (otherwise you get LOADS of buttons, apparently)
         }
     }
 }

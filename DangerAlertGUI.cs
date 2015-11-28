@@ -1,4 +1,7 @@
-﻿using System;
+﻿// DangerAlerts v1.0.0: A KSP mod. Public domain, do whatever you want, man.
+// Author: SpaceIsBig42/Norpo (same person)
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +22,7 @@ namespace DangerAlerts
 
         void Start()
         {
-            //Thank you github!
+            //Thank youuuuuu, github!
             Texture2D texture = new Texture2D(36, 36, TextureFormat.RGBA32, false);
             string textureFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Icons/dangeralerticondef.png");
             texture.LoadImage(File.ReadAllBytes(textureFile));
@@ -44,17 +47,13 @@ namespace DangerAlerts
                 _windowPosition = GUILayout.Window(10, _windowPosition, OnWindow, "Danger Alerts");
             }
         }
-        public void Ping()
-        {
-            Debug.Log("DangerAlertGUI responded!");
-        }
 
         void OnWindow(int windowId)
         {
             if (visible)
             {
                 GUILayout.BeginHorizontal(GUILayout.Width(250f));
-                totalToggle = GUILayout.Toggle(totalToggle, "Enable/Disable everything!");
+                totalToggle = GUILayout.Toggle(totalToggle, "Sound Toggle");
                 GUILayout.EndHorizontal();
 
                 GUI.DragWindow();

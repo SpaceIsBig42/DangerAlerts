@@ -1,4 +1,5 @@
-﻿//DangerAlerts v0.1pancake, a KSP mod, public domain
+﻿// DangerAlerts v1.0.0: A KSP mod. Public domain, do whatever you want, man.
+// Author: SpaceIsBig42/Norpo (same person)
 
 using System;
 using System.Collections.Generic;
@@ -48,7 +49,7 @@ namespace DangerAlerts
             Debug.Log("[DNGRALT] Did file stuff.");
 
             source.volume = 0.5f; //Volume can be changed, and probably should be. Add toolbar volume slider? TODO
-            Debug.Log("Initialized Danger Alert Player");
+            Debug.Log("[DNGRALT] Initialized Danger Alert Player");
         }
         public void MovePlayer(Vessel vessel) //Moves the player, maaaaybe not needed?
         {
