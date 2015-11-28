@@ -26,6 +26,9 @@ namespace DangerAlerts
 
         private int distanceTolerance = 7; //Multiplies the current speed to match with the height
         public bool alarmActive = false;
+
+        private bool pluginActive = true;
+
         void Start()
         {
             Debug.Log("Danger Alerts started."); //Lets the user know the add-on was started, DEBUG
@@ -58,25 +61,34 @@ namespace DangerAlerts
 
         void Update()
         {
-            if (InDangerOfCrashing())
+            pluginActive = dangerAlertGui.totalToggle;
+            if (pluginActive)
             {
-                if (!alarmActive)
+                if (InDangerOfCrashing())
                 {
-                    alarmActive = true;
+                    if (!alarmActive)
+                    {
+                        alarmActive = true;
+                    }
+                    if (!soundplayer.SoundPlaying())
+                    {
+                        soundplayer.PlaySound(FlightGlobals.ActiveVessel);
+                    }
                 }
-                if (!soundplayer.SoundPlaying())
+                else
                 {
-                    soundplayer.PlaySound(FlightGlobals.ActiveVessel);
+                    if (alarmActive)
+                    {
+                        alarmActive = false;
+                        soundplayer.StopSound();
+                    }
                 }
             }
-            else
-            {
-                if (alarmActive)
-                {
-                    alarmActive = false;
-                    soundplayer.StopSound();
-                }
-            }
+        }
+
+        void OnDestroy()
+        {
+            Destroy(dangerAlertGui); //Cleaning, cleaning, oh what fun is cleaning! (otherwise you get LOADS of buttons)
         }
     }
 }
