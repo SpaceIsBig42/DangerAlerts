@@ -18,6 +18,7 @@ namespace DangerAlerts
     {
         private string normalAlert = "DangerAlerts/Sounds/normalAlert";
         AlertSoundPlayer soundplayer = new AlertSoundPlayer();
+        DangerAlertGUI dangerAlertGui;
         private int minimumSpeed = 10; //The alarm will only go off if the speed goes above this
                                         //so you don't get an alarm while on the launchpad
 
@@ -32,6 +33,8 @@ namespace DangerAlerts
             soundplayer.Initialize(normalAlert); // Initializes the player, does some housekeeping
             soundplayer.MovePlayer(FlightGlobals.ActiveVessel); //Moves the player to active vessel, hopefully shouldn't be needed
 
+            dangerAlertGui = gameObject.AddComponent<DangerAlertGUI>();
+            dangerAlertGui.Ping(); //TEMPORARY DEBUG DON'T IGNORE THIS WARNING FUTURE ME
         }
 
         bool InDangerOfCrashing() // Returns a value.
