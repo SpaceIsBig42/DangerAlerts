@@ -33,7 +33,6 @@ namespace DangerAlerts
             Debug.Log("[DNGRALT] Danger Alerts started."); //Lets the user know the add-on was started, DEBUG
             Debug.Log("[DNGRALT] Sound file exists: " + GameDatabase.Instance.ExistsAudioClip(normalAlert));
             soundplayer.Initialize(normalAlert); // Initializes the player, does some housekeeping
-            soundplayer.MovePlayer(FlightGlobals.ActiveVessel.gameObject); //Moves the player to active vessel, hopefully shouldn't be needed
 
             dangerAlertGui = gameObject.AddComponent<DangerAlertGUI>();
         }
@@ -79,7 +78,7 @@ namespace DangerAlerts
                     }
                     if (!soundplayer.SoundPlaying()) //If the sound isn't playing, play the sound.
                     {
-                        soundplayer.PlaySound(FlightGlobals.ActiveVessel); //Plays sound
+                        soundplayer.PlaySound(); //Plays sound
                     }
                 }
                 else

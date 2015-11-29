@@ -17,13 +17,10 @@ namespace DangerAlerts
         public AudioSource source; //The source to be added to the object
         public AudioClip loadedClip;
 
-        public void PlaySound(Vessel vessel)
+        public void PlaySound()
         {
-            Debug.Log("[DNGRALT] Starting to play alarm");
-
             source.audio.clip = loadedClip;
             source.audio.Play();
-            Debug.Log("[DNGRALT] ...Finished");
         }
         public void StopSound()
         {
@@ -52,11 +49,6 @@ namespace DangerAlerts
             source.panLevel = 0;
             Debug.Log("[DNGRALT] Initialized Danger Alert Player");
         }
-        public void MovePlayer(GameObject obj) //Moves the player, maaaaybe not needed? (Apparently not!)
-        {
-           // dangeralertplayer.transform.parent = obj.transform;
-           // dangeralertplayer.transform.localPosition = new Vector3(0, 0, 0);
-            Debug.Log("[DNGRALT] Moving player");
-        }
+        
     }
 }
