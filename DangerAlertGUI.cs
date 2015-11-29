@@ -15,10 +15,10 @@ namespace DangerAlerts
     // [KSPAddon(KSPAddon.Startup.Flight, false)] Where we're going, we don't *need* Startup.Flight.
     class DangerAlertGUI : MonoBehaviour
     {
-        public bool totalToggle = true;
+        public bool totalToggle = true; //The toggle boolean for "disable everything", currently the only toggle (v1.0.0)
         private ApplicationLauncherButton dangerAlertButton;
         private Rect _windowPosition = new Rect();
-        private bool visible = false;
+        private bool visible = false; //Inbuilt "visible" boolean, in case I need it for something else.
 
         void Start()
         {
@@ -52,6 +52,7 @@ namespace DangerAlerts
         {
             if (visible)
             {
+                //I'm sad that this might be obsolete once 1.1 hits, but hey, I need it for now...
                 GUILayout.BeginHorizontal(GUILayout.Width(250f));
                 totalToggle = GUILayout.Toggle(totalToggle, "Sound Toggle");
                 GUILayout.EndHorizontal();
@@ -61,6 +62,7 @@ namespace DangerAlerts
         }
         void OnDestroy()
         {
+            //I don't even want to know why I wrote this, or when. Scared to remove it, though.
             ApplicationLauncher.Instance.RemoveModApplication(dangerAlertButton);
         }
     }

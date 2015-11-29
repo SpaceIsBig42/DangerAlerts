@@ -20,7 +20,7 @@ namespace DangerAlerts
         public void PlaySound(Vessel vessel)
         {
             Debug.Log("[DNGRALT] Starting to play alarm");
-            
+
             source.audio.clip = loadedClip;
             source.audio.Play();
             Debug.Log("[DNGRALT] ...Finished");
@@ -49,12 +49,13 @@ namespace DangerAlerts
             Debug.Log("[DNGRALT] Did file stuff.");
 
             source.volume = 0.5f; //Volume can be changed, and probably should be. Add toolbar volume slider? TODO
+            source.panLevel = 0;
             Debug.Log("[DNGRALT] Initialized Danger Alert Player");
         }
-        public void MovePlayer(Vessel vessel) //Moves the player, maaaaybe not needed?
+        public void MovePlayer(GameObject obj) //Moves the player, maaaaybe not needed? (Apparently not!)
         {
-            dangeralertplayer.transform.parent = vessel.gameObject.transform;
-            dangeralertplayer.transform.localPosition = new Vector3(0, 0, 0);
+           // dangeralertplayer.transform.parent = obj.transform;
+           // dangeralertplayer.transform.localPosition = new Vector3(0, 0, 0);
             Debug.Log("[DNGRALT] Moving player");
         }
     }

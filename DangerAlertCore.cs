@@ -21,7 +21,7 @@ namespace DangerAlerts
         private int minimumSpeed = 10; //The alarm will only go off if the speed goes above this
                                         //so you don't get an alarm while on the launchpad
 
-        public int MinimumVerticalSpeed = 3; //
+        public int MinimumVerticalSpeed = -3; // Speed that the ship has to be falling to trigger the alarm
 
         private int distanceTolerance = 7; //Multiplies the current speed to match with the height
         public bool alarmActive = false;
@@ -33,25 +33,34 @@ namespace DangerAlerts
             Debug.Log("[DNGRALT] Danger Alerts started."); //Lets the user know the add-on was started, DEBUG
             Debug.Log("[DNGRALT] Sound file exists: " + GameDatabase.Instance.ExistsAudioClip(normalAlert));
             soundplayer.Initialize(normalAlert); // Initializes the player, does some housekeeping
-            soundplayer.MovePlayer(FlightGlobals.ActiveVessel); //Moves the player to active vessel, hopefully shouldn't be needed
+            soundplayer.MovePlayer(FlightGlobals.ActiveVessel.gameObject); //Moves the player to active vessel, hopefully shouldn't be needed
 
             dangerAlertGui = gameObject.AddComponent<DangerAlertGUI>();
         }
 
         bool InDangerOfCrashing() // Returns a value.
         {
-            Vessel currentVessel = FlightGlobals.ActiveVessel;
-            if (!currentVessel.Landed && 
-                !currentVessel.situation.Equals(Vessel.Situations.PRELAUNCH)
-                && !currentVessel.situation.Equals(Vessel.Situations.ORBITING)) //The ship probably isn't in danger of crashing if it's landed
+            if (FlightGlobals.ship_altitude < FlightGlobals.getMainBody().timeWarpAltitudeLimits[2])
+            //I'd like to talk a bit about the if statement above, because it's totally rad and bonkers.                  //
+            //For _some_ reason, KSP decides that once you're past that magical threshold, (50x timewarp minimum height)  //
+            //that calculating surface altitude is pointless, so it defaults to *something* low, maybe it's zero,         //
+            //maybe it's -1, I don't know. All I know is, this makes the plugin work. In stock, at least. I'm questioning //
+            //my own sanity writing this, but hey, it works. What else can I say? :)                                      //
             {
-                if ((Math.Abs(currentVessel.verticalSpeed) * distanceTolerance) > currentVessel.heightFromTerrain &&
-                    Math.Abs(currentVessel.srfSpeed) > minimumSpeed && 
-                    currentVessel.verticalSpeed < MinimumVerticalSpeed) // Does fancy math, only "if ship is crashing"
+                Vessel currentVessel = FlightGlobals.ActiveVessel;
+                if (!currentVessel.Landed &&
+                    !currentVessel.situation.Equals(Vessel.Situations.PRELAUNCH)
+                    && !currentVessel.situation.Equals(Vessel.Situations.ORBITING)
+                    ) //The ship probably isn't in danger of crashing if it's landed
                 {
-                    return true; //...I'm in danger!
+                    if ((Math.Abs(currentVessel.verticalSpeed) * distanceTolerance) > currentVessel.heightFromTerrain &&
+                        Math.Abs(currentVessel.srfSpeed) > minimumSpeed &&
+                        currentVessel.verticalSpeed < MinimumVerticalSpeed) // Does fancy math, only "if ship is crashing"
+                    {
+                        return true; //...I'm in danger!
+                    }
+                    return false;
                 }
-                return false;
             }
             return false; //I'm safe.
 
@@ -60,17 +69,17 @@ namespace DangerAlerts
         void Update()
         {
             pluginActive = dangerAlertGui.totalToggle;
-            if (pluginActive)
+            if (pluginActive) //Checks if "totalToggle" is active, i.e the player chose to have no sound
             {
                 if (InDangerOfCrashing())
                 {
-                    if (!alarmActive)
+                    if (!alarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound
                     {
                         alarmActive = true;
                     }
-                    if (!soundplayer.SoundPlaying())
+                    if (!soundplayer.SoundPlaying()) //If the sound isn't playing, play the sound.
                     {
-                        soundplayer.PlaySound(FlightGlobals.ActiveVessel);
+                        soundplayer.PlaySound(FlightGlobals.ActiveVessel); //Plays sound
                     }
                 }
                 else
