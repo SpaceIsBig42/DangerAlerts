@@ -16,6 +16,14 @@ namespace DangerAlerts
     class DangerAlertGUI : MonoBehaviour
     {
         public bool totalToggle = true; //The toggle boolean for "disable everything", currently the only toggle (v1.0.0)
+        private string toleranceBox = "7";
+        private string minimumVerticalSpeedBox = "-3";
+        private string minimumSpeedBox = "10";
+
+        public int ToleranceBox { get { return Int32.Parse(toleranceBox); } }
+        public int MinimumVerticalSpeedBox { get { return Int32.Parse(minimumVerticalSpeedBox); } }
+        public int MinimumSpeedBox { get { return Int32.Parse(minimumSpeedBox); } }
+
         private ApplicationLauncherButton dangerAlertButton;
         private Rect _windowPosition = new Rect();
         private bool visible = false; //Inbuilt "visible" boolean, in case I need it for something else.
@@ -27,7 +35,7 @@ namespace DangerAlerts
             string textureFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Icons/dangeralerticondef.png");
             texture.LoadImage(File.ReadAllBytes(textureFile));
             dangerAlertButton = ApplicationLauncher.Instance.AddModApplication(GuiOn, GuiOff, null, null, null, null,
-                ApplicationLauncher.AppScenes.FLIGHT, texture);
+               (ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW), texture);
         }
         public void GuiOn()
         {
@@ -53,11 +61,55 @@ namespace DangerAlerts
             if (visible)
             {
                 //I'm sad that this might be obsolete once 1.1 hits, but hey, I need it for now...
-                GUILayout.BeginHorizontal(GUILayout.Width(250f));
+                GUILayout.BeginVertical(GUILayout.Width(250f));
                 totalToggle = GUILayout.Toggle(totalToggle, "Sound Toggle");
-                GUILayout.EndHorizontal();
+                GUILayout.Label("Tolerance (7):");
+                toleranceBox = GUI.TextField(new Rect(200, 60, 50, 20), toleranceBox, 2);
+                GUILayout.Label("Minimum Vert Speed (-3):");
+                minimumVerticalSpeedBox = GUI.TextField(new Rect(200, 90, 50, 20), minimumVerticalSpeedBox, 3);
+                GUILayout.Label("Minimum Speed (10):");
+                minimumSpeedBox = GUI.TextField(new Rect(200, 120, 50, 20), minimumSpeedBox, 2);
+                GUILayout.EndVertical();
+                
 
                 GUI.DragWindow();
+                ValueCheck();
+            }
+        }
+        void ValueCheck()
+        {
+            try
+            {
+                if (Int32.Parse(toleranceBox) < 1)
+                {
+                    toleranceBox = "1";
+                }
+            }
+            catch (FormatException e)
+            {
+                toleranceBox = "1";
+            }
+            try
+            {
+                if (Int32.Parse(minimumVerticalSpeedBox) > 0)
+                {
+                    toleranceBox = "0";
+                }
+            }
+            catch (FormatException e)
+            {
+                toleranceBox = "0";
+            }
+            try
+            {
+                if (Int32.Parse(minimumSpeedBox) < 0)
+                {
+                    toleranceBox = "0";
+                }
+            }
+            catch (FormatException e)
+            {
+                toleranceBox = "0";
             }
         }
         void OnDestroy()

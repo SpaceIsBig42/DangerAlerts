@@ -70,6 +70,9 @@ namespace DangerAlerts
             pluginActive = dangerAlertGui.totalToggle;
             if (pluginActive) //Checks if "totalToggle" is active, i.e the player chose to have no sound
             {
+                distanceTolerance = dangerAlertGui.ToleranceBox;
+                MinimumVerticalSpeed = dangerAlertGui.MinimumVerticalSpeedBox;
+                minimumSpeed = dangerAlertGui.MinimumSpeedBox;
                 if (InDangerOfCrashing())
                 {
                     if (!alarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound
