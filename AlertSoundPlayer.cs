@@ -46,7 +46,7 @@ namespace DangerAlerts
             Debug.Log("[DNGRALT] Did file stuff.");
 
             source.volume = 0.5f; //Volume can be changed, and probably should be. Add toolbar volume slider? TODO
-            source.panLevel = 0;
+            source.panLevel = 0; //Forces the sound to go 2D, to not decay over distance.
             Debug.Log("[DNGRALT] Initialized Danger Alert Player");
         }
         
