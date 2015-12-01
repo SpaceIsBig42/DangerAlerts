@@ -12,7 +12,7 @@ using System.IO;
 
 namespace DangerAlerts
 {
-    [KSPAddon(KSPAddon.Startup.Flight, false)] //Starts on flight
+    [KSPAddon(KSPAddon.Startup.Flight, true)] //Starts on flight
     public class DangerAlertCore : MonoBehaviour
     {
         private string normalAlert = "DangerAlerts/Sounds/normalAlert";
@@ -35,6 +35,7 @@ namespace DangerAlerts
             soundplayer.Initialize(normalAlert); // Initializes the player, does some housekeeping
 
             dangerAlertGui = gameObject.AddComponent<DangerAlertGUI>();
+            DontDestroyOnLoad(this);
         }
 
         bool InDangerOfCrashing() // Returns a value.
@@ -67,37 +68,35 @@ namespace DangerAlerts
 
         void Update()
         {
-            pluginActive = dangerAlertGui.totalToggle;
-            if (pluginActive) //Checks if "totalToggle" is active, i.e the player chose to have no sound
+            if (HighLogic.LoadedSceneIsFlight)
             {
-                distanceTolerance = dangerAlertGui.ToleranceBox;
-                MinimumVerticalSpeed = dangerAlertGui.MinimumVerticalSpeedBox;
-                minimumSpeed = dangerAlertGui.MinimumSpeedBox;
-                if (InDangerOfCrashing())
+                pluginActive = dangerAlertGui.totalToggle;
+                if (pluginActive) //Checks if "totalToggle" is active, i.e the player chose to have no sound
                 {
-                    if (!alarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound
+                    distanceTolerance = dangerAlertGui.ToleranceBox;
+                    MinimumVerticalSpeed = dangerAlertGui.MinimumVerticalSpeedBox;
+                    minimumSpeed = dangerAlertGui.MinimumSpeedBox;
+                    if (InDangerOfCrashing())
                     {
-                        alarmActive = true;
+                        if (!alarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound
+                        {
+                            alarmActive = true;
+                        }
+                        if (!soundplayer.SoundPlaying()) //If the sound isn't playing, play the sound.
+                        {
+                            soundplayer.PlaySound(); //Plays sound
+                        }
                     }
-                    if (!soundplayer.SoundPlaying()) //If the sound isn't playing, play the sound.
+                    else
                     {
-                        soundplayer.PlaySound(); //Plays sound
-                    }
-                }
-                else
-                {
-                    if (alarmActive)
-                    {
-                        alarmActive = false;
-                        soundplayer.StopSound();
+                        if (alarmActive)
+                        {
+                            alarmActive = false;
+                            soundplayer.StopSound();
+                        }
                     }
                 }
             }
-        }
-
-        void OnDestroy()
-        {
-            Destroy(dangerAlertGui); //Cleaning, cleaning, oh what fun is cleaning! (otherwise you get LOADS of buttons, apparently)
         }
     }
 }
