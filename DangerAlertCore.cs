@@ -28,6 +28,8 @@ namespace DangerAlerts
 
         private bool pluginActive = true;
 
+        public bool Paused = false;
+
         void Start()
         {
             Debug.Log("[DNGRALT] Danger Alerts started."); //Lets the user know the add-on was started, DEBUG
@@ -36,8 +38,24 @@ namespace DangerAlerts
 
             dangerAlertGui = gameObject.AddComponent<DangerAlertGUI>();
             DontDestroyOnLoad(this);
+
+            GameEvents.onGamePause.Add(OnPause);
+            GameEvents.onGameUnpause.Add(OnUnpause);
         }
 
+        void OnPause()
+        {
+            Paused = true;
+            if (soundplayer.SoundPlaying())
+            {
+                soundplayer.StopSound();
+            }
+        }
+
+        void OnUnpause()
+        {
+            Paused = false;
+        }
         bool InDangerOfCrashing() // Returns a value.
         {
             if (FlightGlobals.ship_altitude < FlightGlobals.getMainBody().timeWarpAltitudeLimits[2])
@@ -68,7 +86,7 @@ namespace DangerAlerts
 
         void Update()
         {
-            if (HighLogic.LoadedSceneIsFlight)
+            if (HighLogic.LoadedSceneIsFlight && !Paused)
             {
                 pluginActive = dangerAlertGui.totalToggle;
                 if (pluginActive) //Checks if "totalToggle" is active, i.e the player chose to have no sound
@@ -76,6 +94,7 @@ namespace DangerAlerts
                     distanceTolerance = dangerAlertGui.ToleranceBox;
                     MinimumVerticalSpeed = dangerAlertGui.MinimumVerticalSpeedBox;
                     minimumSpeed = dangerAlertGui.MinimumSpeedBox;
+                    soundplayer.SetVolume(dangerAlertGui.VolumeSlider);
                     if (InDangerOfCrashing())
                     {
                         if (!alarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound

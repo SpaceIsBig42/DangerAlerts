@@ -19,11 +19,12 @@ namespace DangerAlerts
         private string toleranceBox = "7";
         private string minimumVerticalSpeedBox = "-3";
         private string minimumSpeedBox = "10";
+        private float volumeSlider = 0.5f;
 
         public int ToleranceBox { get { return Int32.Parse(toleranceBox); } }
         public int MinimumVerticalSpeedBox { get { return Int32.Parse(minimumVerticalSpeedBox); } }
         public int MinimumSpeedBox { get { return Int32.Parse(minimumSpeedBox); } }
-
+        public float VolumeSlider { get { return volumeSlider; } }
         private ApplicationLauncherButton dangerAlertButton;
         private Rect _windowPosition = new Rect();
         private bool visible = false; //Inbuilt "visible" boolean, in case I need it for something else.
@@ -69,6 +70,8 @@ namespace DangerAlerts
                 minimumVerticalSpeedBox = GUI.TextField(new Rect(200, 90, 50, 20), minimumVerticalSpeedBox, 3);
                 GUILayout.Label("Minimum Speed (10):");
                 minimumSpeedBox = GUI.TextField(new Rect(200, 120, 50, 20), minimumSpeedBox, 2);
+                GUILayout.Label("Master Volume:");
+                volumeSlider = GUI.HorizontalSlider(new Rect(135, 150, 110, 10), volumeSlider, 0f, 1f);
                 GUILayout.EndVertical();
                 
 

@@ -22,6 +22,10 @@ namespace DangerAlerts
             source.audio.clip = loadedClip;
             source.audio.Play();
         }
+        public void SetVolume(float vol)
+        {
+            source.audio.volume = vol;
+        }
         public void StopSound()
         {
             source.audio.Stop();
