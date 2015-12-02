@@ -49,6 +49,7 @@
     <Compile Include="AlertSoundPlayer.cs" />
     <Compile Include="DangerAlertCore.cs" />
     <Compile Include="DangerAlertGUI.cs" />
+    <Compile Include="DangerAlertSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -12,18 +12,13 @@ using System.IO;
 
 namespace DangerAlerts
 {
-    [KSPAddon(KSPAddon.Startup.Flight, true)] //Starts on flight
+    [KSPAddon(KSPAddon.Startup.Flight, false)] //Starts on flight
     public class DangerAlertCore : MonoBehaviour
     {
         private string normalAlert = "DangerAlerts/Sounds/normalAlert";
         AlertSoundPlayer soundplayer = new AlertSoundPlayer();
         DangerAlertGUI dangerAlertGui;
-        private int minimumSpeed = 10; //The alarm will only go off if the speed goes above this
-                                        //so you don't get an alarm while on the launchpad
 
-        public int MinimumVerticalSpeed = -3; // Speed that the ship has to be falling to trigger the alarm
-
-        private int distanceTolerance = 7; //Multiplies the current speed to match with the height
         public bool alarmActive = false;
 
         private bool pluginActive = true;
@@ -37,7 +32,6 @@ namespace DangerAlerts
             soundplayer.Initialize(normalAlert); // Initializes the player, does some housekeeping
 
             dangerAlertGui = gameObject.AddComponent<DangerAlertGUI>();
-            DontDestroyOnLoad(this);
 
             GameEvents.onGamePause.Add(OnPause);
             GameEvents.onGameUnpause.Add(OnUnpause);
@@ -71,9 +65,9 @@ namespace DangerAlerts
                     && !currentVessel.situation.Equals(Vessel.Situations.ORBITING)
                     ) //The ship probably isn't in danger of crashing if it's landed
                 {
-                    if ((Math.Abs(currentVessel.verticalSpeed) * distanceTolerance) > currentVessel.heightFromTerrain &&
-                        Math.Abs(currentVessel.srfSpeed) > minimumSpeed &&
-                        currentVessel.verticalSpeed < MinimumVerticalSpeed) // Does fancy math, only "if ship is crashing"
+                    if ((Math.Abs(currentVessel.verticalSpeed) * DangerAlertSettings.Tolerance) > currentVessel.heightFromTerrain &&
+                        Math.Abs(currentVessel.srfSpeed) > DangerAlertSettings.MinimumSpeed &&
+                        currentVessel.verticalSpeed < DangerAlertSettings.MinimumVerticalSpeed) // Does fancy math, only "if ship is crashing"
                     {
                         return true; //...I'm in danger!
                     }
@@ -91,10 +85,9 @@ namespace DangerAlerts
                 pluginActive = dangerAlertGui.totalToggle;
                 if (pluginActive) //Checks if "totalToggle" is active, i.e the player chose to have no sound
                 {
-                    distanceTolerance = dangerAlertGui.ToleranceBox;
-                    MinimumVerticalSpeed = dangerAlertGui.MinimumVerticalSpeedBox;
-                    minimumSpeed = dangerAlertGui.MinimumSpeedBox;
-                    soundplayer.SetVolume(dangerAlertGui.VolumeSlider);
+                    DangerAlertSettings.UpdateFromGui(dangerAlertGui);
+
+                    soundplayer.SetVolume(DangerAlertSettings.MasterVolume);
                     if (InDangerOfCrashing())
                     {
                         if (!alarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound

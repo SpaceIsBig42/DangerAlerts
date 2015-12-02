@@ -16,17 +16,17 @@ namespace DangerAlerts
     class DangerAlertGUI : MonoBehaviour
     {
         public bool totalToggle = true; //The toggle boolean for "disable everything", currently the only toggle (v1.0.0)
-        private string toleranceBox = "7";
-        private string minimumVerticalSpeedBox = "-3";
-        private string minimumSpeedBox = "10";
-        private float volumeSlider = 0.5f;
+        private string toleranceBox = DangerAlertSettings.Tolerance.ToString();
+        private string minimumVerticalSpeedBox = DangerAlertSettings.MinimumVerticalSpeed.ToString();
+        private string minimumSpeedBox = DangerAlertSettings.MinimumSpeed.ToString();
+        private float volumeSlider = DangerAlertSettings.MasterVolume;
 
         public int ToleranceBox { get { return Int32.Parse(toleranceBox); } }
         public int MinimumVerticalSpeedBox { get { return Int32.Parse(minimumVerticalSpeedBox); } }
         public int MinimumSpeedBox { get { return Int32.Parse(minimumSpeedBox); } }
         public float VolumeSlider { get { return volumeSlider; } }
         private ApplicationLauncherButton dangerAlertButton;
-        private Rect _windowPosition = new Rect();
+        private Rect windowPosition = DangerAlertSettings.GUIPosition;
         private bool visible = false; //Inbuilt "visible" boolean, in case I need it for something else.
 
         void Start()
@@ -53,7 +53,7 @@ namespace DangerAlerts
         {
             if (visible)
             {
-                _windowPosition = GUILayout.Window(10, _windowPosition, OnWindow, "Danger Alerts");
+                windowPosition = GUILayout.Window(10, windowPosition, OnWindow, "Danger Alerts");
             }
         }
 
@@ -115,6 +115,12 @@ namespace DangerAlerts
                 toleranceBox = "0";
             }
         }
+
+        public Rect GetPosition()
+        {
+            return windowPosition;
+        }
+
         void OnDestroy()
         {
             //I don't even want to know why I wrote this, or when. Scared to remove it, though.
