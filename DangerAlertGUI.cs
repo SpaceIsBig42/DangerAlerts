@@ -15,29 +15,52 @@ namespace DangerAlerts
     // [KSPAddon(KSPAddon.Startup.Flight, false)] Where we're going, we don't *need* Startup.Flight.
     class DangerAlertGUI : MonoBehaviour
     {
-        public bool totalToggle = true; //The toggle boolean for "disable everything", currently the only toggle (v1.0.0)
-        private string toleranceBox = DangerAlertSettings.Tolerance.ToString();
-        private string minimumVerticalSpeedBox = DangerAlertSettings.MinimumVerticalSpeed.ToString();
-        private string minimumSpeedBox = DangerAlertSettings.MinimumSpeed.ToString();
-        private float volumeSlider = DangerAlertSettings.MasterVolume;
+        public bool soundToggle = DangerAlertSettings.Instance.SoundToggle; //The toggle boolean for "disable all sound", 
+                                                                            //currently the only toggle (v1.1), now only toggles sound
+
+        private string toleranceBox = DangerAlertSettings.Instance.Tolerance.ToString();
+        private string minimumVerticalSpeedBox = DangerAlertSettings.Instance.MinimumVerticalSpeed.ToString();
+        private string minimumSpeedBox = DangerAlertSettings.Instance.MinimumSpeed.ToString();
+        private float volumeSlider = DangerAlertSettings.Instance.MasterVolume;
 
         public int ToleranceBox { get { return Int32.Parse(toleranceBox); } }
         public int MinimumVerticalSpeedBox { get { return Int32.Parse(minimumVerticalSpeedBox); } }
         public int MinimumSpeedBox { get { return Int32.Parse(minimumSpeedBox); } }
         public float VolumeSlider { get { return volumeSlider; } }
         private ApplicationLauncherButton dangerAlertButton;
-        private Rect windowPosition = DangerAlertSettings.GUIPosition;
+        private Rect windowPosition = DangerAlertSettings.Instance.GUIPosition;
         private bool visible = false; //Inbuilt "visible" boolean, in case I need it for something else.
+
+        private Texture2D safeTexture;
+        private Texture2D dangerTexture;
 
         void Start()
         {
             //Thank youuuuuu, github!
-            Texture2D texture = new Texture2D(36, 36, TextureFormat.RGBA32, false);
-            string textureFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Icons/dangeralerticondef.png");
-            texture.LoadImage(File.ReadAllBytes(textureFile));
+            safeTexture = new Texture2D(36, 36, TextureFormat.RGBA32, false);
+            string safeTextureFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Icons/safeicon.png");
+            safeTexture.LoadImage(File.ReadAllBytes(safeTextureFile));
+
+            dangerTexture = new Texture2D(36, 36, TextureFormat.RGBA32, false);
+            string dangerTextureFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Icons/dangericon.png");
+            dangerTexture.LoadImage(File.ReadAllBytes(dangerTextureFile));
+
             dangerAlertButton = ApplicationLauncher.Instance.AddModApplication(GuiOn, GuiOff, null, null, null, null,
-               (ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW), texture);
+               (ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW), safeTexture);
         }
+
+        public void InDanger(bool danger)
+        {
+            if (danger)
+            {
+                dangerAlertButton.SetTexture(dangerTexture);
+            }
+            else
+            {
+                dangerAlertButton.SetTexture(safeTexture);
+            }
+        }
+
         public void GuiOn()
         {
             visible = true;
@@ -63,7 +86,7 @@ namespace DangerAlerts
             {
                 //I'm sad that this might be obsolete once 1.1 hits, but hey, I need it for now...
                 GUILayout.BeginVertical(GUILayout.Width(250f));
-                totalToggle = GUILayout.Toggle(totalToggle, "Sound Toggle");
+                soundToggle = GUILayout.Toggle(soundToggle, "Sound Toggle");
                 GUILayout.Label("Tolerance (7):");
                 toleranceBox = GUI.TextField(new Rect(200, 60, 50, 20), toleranceBox, 2);
                 GUILayout.Label("Minimum Vert Speed (-3):");

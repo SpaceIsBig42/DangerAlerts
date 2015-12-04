@@ -21,7 +21,7 @@ namespace DangerAlerts
 
         public bool alarmActive = false;
 
-        private bool pluginActive = true;
+        private bool soundActive = true;
 
         public bool Paused = false;
 
@@ -31,10 +31,13 @@ namespace DangerAlerts
             Debug.Log("[DNGRALT] Sound file exists: " + GameDatabase.Instance.ExistsAudioClip(normalAlert));
             soundplayer.Initialize(normalAlert); // Initializes the player, does some housekeeping
 
+            DangerAlertSettings.Instance.UpdateFromCfg();
+
             dangerAlertGui = gameObject.AddComponent<DangerAlertGUI>();
 
             GameEvents.onGamePause.Add(OnPause);
             GameEvents.onGameUnpause.Add(OnUnpause);
+
         }
 
         void OnPause()
@@ -65,9 +68,9 @@ namespace DangerAlerts
                     && !currentVessel.situation.Equals(Vessel.Situations.ORBITING)
                     ) //The ship probably isn't in danger of crashing if it's landed
                 {
-                    if ((Math.Abs(currentVessel.verticalSpeed) * DangerAlertSettings.Tolerance) > currentVessel.heightFromTerrain &&
-                        Math.Abs(currentVessel.srfSpeed) > DangerAlertSettings.MinimumSpeed &&
-                        currentVessel.verticalSpeed < DangerAlertSettings.MinimumVerticalSpeed) // Does fancy math, only "if ship is crashing"
+                    if ((Math.Abs(currentVessel.verticalSpeed) * DangerAlertSettings.Instance.Tolerance) > currentVessel.heightFromTerrain &&
+                        Math.Abs(currentVessel.srfSpeed) > DangerAlertSettings.Instance.MinimumSpeed &&
+                        currentVessel.verticalSpeed < DangerAlertSettings.Instance.MinimumVerticalSpeed) // Does fancy math, only "if ship is crashing"
                     {
                         return true; //...I'm in danger!
                     }
@@ -82,33 +85,41 @@ namespace DangerAlerts
         {
             if (HighLogic.LoadedSceneIsFlight && !Paused)
             {
-                pluginActive = dangerAlertGui.totalToggle;
-                if (pluginActive) //Checks if "totalToggle" is active, i.e the player chose to have no sound
-                {
-                    DangerAlertSettings.UpdateFromGui(dangerAlertGui);
+                soundActive = dangerAlertGui.totalToggle;
+                DangerAlertSettings.Instance.UpdateFromGui(dangerAlertGui);
 
-                    soundplayer.SetVolume(DangerAlertSettings.MasterVolume);
-                    if (InDangerOfCrashing())
+                soundplayer.SetVolume(DangerAlertSettings.Instance.MasterVolume);
+                if (InDangerOfCrashing())
+                {
+                    if (!alarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound
                     {
-                        if (!alarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound
-                        {
-                            alarmActive = true;
-                        }
-                        if (!soundplayer.SoundPlaying()) //If the sound isn't playing, play the sound.
+                        alarmActive = true;
+                        dangerAlertGui.InDanger(true);
+                    }
+                    if (!soundplayer.SoundPlaying()) //If the sound isn't playing, play the sound.
+                    {
+                        if (soundActive)
                         {
                             soundplayer.PlaySound(); //Plays sound
                         }
                     }
-                    else
+                }
+                else
+                {
+                    if (alarmActive)
                     {
-                        if (alarmActive)
-                        {
-                            alarmActive = false;
-                            soundplayer.StopSound();
-                        }
+                        alarmActive = false;
+                        dangerAlertGui.InDanger(false);
+                        soundplayer.StopSound();
                     }
                 }
+
             }
+        }
+
+        void OnDestroy()
+        {
+            DangerAlertSettings.Instance.SaveCfg();
         }
     }
 }
