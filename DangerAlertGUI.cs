@@ -1,4 +1,4 @@
-﻿// DangerAlerts v1.0.0: A KSP mod. Public domain, do whatever you want, man.
+﻿// DangerAlerts v1.0.1: A KSP mod. Public domain, do whatever you want, man.
 // Author: SpaceIsBig42/Norpo (same person)
 
 using System;
@@ -12,7 +12,6 @@ using System.Reflection;
 
 namespace DangerAlerts
 {
-    // [KSPAddon(KSPAddon.Startup.Flight, false)] Where we're going, we don't *need* Startup.Flight.
     class DangerAlertGUI : MonoBehaviour
     {
         public bool soundToggle = DangerAlertSettings.Instance.SoundToggle; //The toggle boolean for "disable all sound", 
@@ -103,6 +102,9 @@ namespace DangerAlerts
             }
         }
         void ValueCheck()
+            //Simple sanity check function, checks if the field is a possible value, if not, defaults to one.
+            //This can be annoying when you're trying to type in a new value, and should be replaced by a different
+            //system once KSP v1.1 hits, so I can know what I'm actually doing with the GUI then.
         {
             try
             {
@@ -117,25 +119,25 @@ namespace DangerAlerts
             }
             try
             {
-                if (Int32.Parse(minimumVerticalSpeedBox) > 0)
+                if (Int32.Parse(minimumVerticalSpeedBox) > -1)
                 {
-                    toleranceBox = "0";
+                    minimumVerticalSpeedBox = "-1";
                 }
             }
             catch (FormatException e)
             {
-                toleranceBox = "0";
+                minimumVerticalSpeedBox = "-1";
             }
             try
             {
                 if (Int32.Parse(minimumSpeedBox) < 0)
                 {
-                    toleranceBox = "0";
+                    minimumSpeedBox = "0";
                 }
             }
             catch (FormatException e)
             {
-                toleranceBox = "0";
+                minimumSpeedBox = "0";
             }
         }
 

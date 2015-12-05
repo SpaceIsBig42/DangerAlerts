@@ -1,4 +1,4 @@
-﻿// DangerAlerts v1.0.0: A KSP mod. Public domain, do whatever you want, man.
+﻿// DangerAlerts v1.0.1: A KSP mod. Public domain, do whatever you want, man.
 // Author: SpaceIsBig42/Norpo (same person)
 
 using System;
@@ -55,14 +55,16 @@ namespace DangerAlerts
         }
         bool InDangerOfCrashing() // Returns a value.
         {
-            if (FlightGlobals.ship_altitude < FlightGlobals.getMainBody().timeWarpAltitudeLimits[2])
+            Vessel currentVessel = FlightGlobals.ActiveVessel;
+            if (currentVessel.heightFromTerrain > 0)
             //I'd like to talk a bit about the if statement above, because it's totally rad and bonkers.                  //
-            //For _some_ reason, KSP decides that once you're past that magical threshold, (50x timewarp minimum height)  //
+            //For _some_ reason, KSP decides that once you're past that magical threshold,                                //
+            //usually, but not always 50x timewarp minimum height,                                                        //
             //that calculating surface altitude is pointless, so it defaults to *something* low, maybe it's zero,         //
             //maybe it's -1, I don't know. All I know is, this makes the plugin work. In stock, at least. I'm questioning //
             //my own sanity writing this, but hey, it works. What else can I say? :)                                      //
             {
-                Vessel currentVessel = FlightGlobals.ActiveVessel;
+                
                 if (!currentVessel.Landed &&
                     !currentVessel.situation.Equals(Vessel.Situations.PRELAUNCH)
                     && !currentVessel.situation.Equals(Vessel.Situations.ORBITING)
@@ -85,7 +87,7 @@ namespace DangerAlerts
         {
             if (HighLogic.LoadedSceneIsFlight && !Paused)
             {
-                soundActive = dangerAlertGui.totalToggle;
+                soundActive = dangerAlertGui.soundToggle;
                 DangerAlertSettings.Instance.UpdateFromGui(dangerAlertGui);
 
                 soundplayer.SetVolume(DangerAlertSettings.Instance.MasterVolume);
@@ -119,6 +121,7 @@ namespace DangerAlerts
 
         void OnDestroy()
         {
+            //When the core class is destroyed, save options to the cfg.
             DangerAlertSettings.Instance.SaveCfg();
         }
     }
