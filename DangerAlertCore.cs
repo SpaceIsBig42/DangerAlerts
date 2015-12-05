@@ -1,4 +1,4 @@
-﻿// DangerAlerts v1.0.0: A KSP mod. Public domain, do whatever you want, man.
+﻿// DangerAlerts v1.0.1: A KSP mod. Public domain, do whatever you want, man.
 // Author: SpaceIsBig42/Norpo (same person)
 
 using System;
@@ -18,15 +18,12 @@ namespace DangerAlerts
         private string normalAlert = "DangerAlerts/Sounds/normalAlert";
         AlertSoundPlayer soundplayer = new AlertSoundPlayer();
         DangerAlertGUI dangerAlertGui;
-        private int minimumSpeed = 10; //The alarm will only go off if the speed goes above this
-                                        //so you don't get an alarm while on the launchpad
 
-        public int MinimumVerticalSpeed = -3; // Speed that the ship has to be falling to trigger the alarm
-
-        private int distanceTolerance = 7; //Multiplies the current speed to match with the height
         public bool alarmActive = false;
 
-        private bool pluginActive = true;
+        private bool soundActive = true;
+
+        public bool Paused = false;
 
         void Start()
         {
@@ -34,27 +31,48 @@ namespace DangerAlerts
             Debug.Log("[DNGRALT] Sound file exists: " + GameDatabase.Instance.ExistsAudioClip(normalAlert));
             soundplayer.Initialize(normalAlert); // Initializes the player, does some housekeeping
 
+            DangerAlertSettings.Instance.UpdateFromCfg();
+
             dangerAlertGui = gameObject.AddComponent<DangerAlertGUI>();
+
+            GameEvents.onGamePause.Add(OnPause);
+            GameEvents.onGameUnpause.Add(OnUnpause);
+
         }
 
+        void OnPause()
+        {
+            Paused = true;
+            if (soundplayer.SoundPlaying())
+            {
+                soundplayer.StopSound();
+            }
+        }
+
+        void OnUnpause()
+        {
+            Paused = false;
+        }
         bool InDangerOfCrashing() // Returns a value.
         {
-            if (FlightGlobals.ship_altitude < FlightGlobals.getMainBody().timeWarpAltitudeLimits[2])
+            Vessel currentVessel = FlightGlobals.ActiveVessel;
+            if (currentVessel.heightFromTerrain > 0)
             //I'd like to talk a bit about the if statement above, because it's totally rad and bonkers.                  //
-            //For _some_ reason, KSP decides that once you're past that magical threshold, (50x timewarp minimum height)  //
+            //For _some_ reason, KSP decides that once you're past that magical threshold,                                //
+            //usually, but not always 50x timewarp minimum height,                                                        //
             //that calculating surface altitude is pointless, so it defaults to *something* low, maybe it's zero,         //
             //maybe it's -1, I don't know. All I know is, this makes the plugin work. In stock, at least. I'm questioning //
             //my own sanity writing this, but hey, it works. What else can I say? :)                                      //
             {
-                Vessel currentVessel = FlightGlobals.ActiveVessel;
+                
                 if (!currentVessel.Landed &&
                     !currentVessel.situation.Equals(Vessel.Situations.PRELAUNCH)
                     && !currentVessel.situation.Equals(Vessel.Situations.ORBITING)
                     ) //The ship probably isn't in danger of crashing if it's landed
                 {
-                    if ((Math.Abs(currentVessel.verticalSpeed) * distanceTolerance) > currentVessel.heightFromTerrain &&
-                        Math.Abs(currentVessel.srfSpeed) > minimumSpeed &&
-                        currentVessel.verticalSpeed < MinimumVerticalSpeed) // Does fancy math, only "if ship is crashing"
+                    if ((Math.Abs(currentVessel.verticalSpeed) * DangerAlertSettings.Instance.Tolerance) > currentVessel.heightFromTerrain &&
+                        Math.Abs(currentVessel.srfSpeed) > DangerAlertSettings.Instance.MinimumSpeed &&
+                        currentVessel.verticalSpeed < DangerAlertSettings.Instance.MinimumVerticalSpeed) // Does fancy math, only "if ship is crashing"
                     {
                         return true; //...I'm in danger!
                     }
@@ -67,21 +85,25 @@ namespace DangerAlerts
 
         void Update()
         {
-            pluginActive = dangerAlertGui.totalToggle;
-            if (pluginActive) //Checks if "totalToggle" is active, i.e the player chose to have no sound
+            if (HighLogic.LoadedSceneIsFlight && !Paused)
             {
-                distanceTolerance = dangerAlertGui.ToleranceBox;
-                MinimumVerticalSpeed = dangerAlertGui.MinimumVerticalSpeedBox;
-                minimumSpeed = dangerAlertGui.MinimumSpeedBox;
+                soundActive = dangerAlertGui.soundToggle;
+                DangerAlertSettings.Instance.UpdateFromGui(dangerAlertGui);
+
+                soundplayer.SetVolume(DangerAlertSettings.Instance.MasterVolume);
                 if (InDangerOfCrashing())
                 {
                     if (!alarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound
                     {
                         alarmActive = true;
+                        dangerAlertGui.InDanger(true);
                     }
                     if (!soundplayer.SoundPlaying()) //If the sound isn't playing, play the sound.
                     {
-                        soundplayer.PlaySound(); //Plays sound
+                        if (soundActive)
+                        {
+                            soundplayer.PlaySound(); //Plays sound
+                        }
                     }
                 }
                 else
@@ -89,15 +111,18 @@ namespace DangerAlerts
                     if (alarmActive)
                     {
                         alarmActive = false;
+                        dangerAlertGui.InDanger(false);
                         soundplayer.StopSound();
                     }
                 }
+
             }
         }
 
         void OnDestroy()
         {
-            Destroy(dangerAlertGui); //Cleaning, cleaning, oh what fun is cleaning! (otherwise you get LOADS of buttons, apparently)
+            //When the core class is destroyed, save options to the cfg.
+            DangerAlertSettings.Instance.SaveCfg();
         }
     }
 }
