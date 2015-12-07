@@ -53,9 +53,8 @@ namespace DangerAlerts
         {
             Paused = false;
         }
-        bool InDangerOfCrashing() // Returns a value.
+        bool InDangerOfCrashing(Vessel currentVessel) // Returns a value.
         {
-            Vessel currentVessel = FlightGlobals.ActiveVessel;
             if (currentVessel.heightFromTerrain > 0)
             //I'd like to talk a bit about the if statement above, because it's totally rad and bonkers.                  //
             //For _some_ reason, KSP decides that once you're past that magical threshold,                                //
@@ -83,15 +82,46 @@ namespace DangerAlerts
 
         }
 
+        bool LowResourceAlert(Vessel currentVessel, string resStr, byte percentage)
+        {
+            foreach (Vessel.ActiveResource res in currentVessel.GetActiveResources())
+            {
+                if (res.info.name.ToUpper() == resStr)
+                {
+                    if (res.amount < res.maxAmount * (percentage * 0.01))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         void Update()
         {
             if (HighLogic.LoadedSceneIsFlight && !Paused)
             {
+                Vessel currentVessel = FlightGlobals.ActiveVessel;
                 soundActive = dangerAlertGui.soundToggle;
                 DangerAlertSettings.Instance.UpdateFromGui(dangerAlertGui);
 
                 soundplayer.SetVolume(DangerAlertSettings.Instance.MasterVolume);
-                if (InDangerOfCrashing())
+                if (InDangerOfCrashing(currentVessel))
+                {
+                    if (!alarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound
+                    {
+                        alarmActive = true;
+                        dangerAlertGui.InDanger(true);
+                    }
+                    if (!soundplayer.SoundPlaying()) //If the sound isn't playing, play the sound.
+                    {
+                        if (soundActive)
+                        {
+                            soundplayer.PlaySound(); //Plays sound
+                        }
+                    }
+                }
+                else if (LowResourceAlert(currentVessel, "ELECTRICCHARGE", 20))
                 {
                     if (!alarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound
                     {
