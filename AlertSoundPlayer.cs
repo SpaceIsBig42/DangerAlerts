@@ -1,4 +1,4 @@
-﻿// DangerAlerts v1.0.1: A KSP mod. Public domain, do whatever you want, man.
+﻿// DangerAlerts v1.1: A KSP mod. Public domain, do whatever you want, man.
 // Author: SpaceIsBig42/Norpo (same person)
 
 using System;

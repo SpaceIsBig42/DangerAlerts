@@ -47,11 +47,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlertBase.cs" />
+    <Compile Include="DangerAlertList.cs" />
     <Compile Include="AlertSoundPlayer.cs" />
     <Compile Include="CollisionAlert.cs" />
     <Compile Include="DangerAlertCore.cs" />
     <Compile Include="DangerAlertGUI.cs" />
     <Compile Include="DangerAlertSettings.cs" />
+    <Compile Include="DangerAlertUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceAlert.cs" />
   </ItemGroup>

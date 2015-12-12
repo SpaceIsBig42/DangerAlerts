@@ -1,4 +1,4 @@
-﻿// DangerAlerts v1.0.1: A KSP mod. Public domain, do whatever you want, man.
+﻿// DangerAlerts v1.1: A KSP mod. Public domain, do whatever you want, man.
 // Author: SpaceIsBig42/Norpo (same person)
 
 using System;
@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using KSP;
+
 
 namespace DangerAlerts
 {
@@ -25,24 +26,24 @@ namespace DangerAlerts
             }
         }
 
-        protected string filePath = KSPUtil.ApplicationRootPath + "GameData/DangerAlerts/options.cfg"; //File path
+
+
+        private string filePath = KSPUtil.ApplicationRootPath + "GameData/DangerAlerts/options.cfg"; //File path
 
         [Persistent] public bool SoundToggle = true;
-        [Persistent] public int Tolerance = 7;
-        [Persistent] public int MinimumVerticalSpeed = -3;
-        [Persistent] public int MinimumSpeed = 10;
         [Persistent] public float MasterVolume = 0.5f;
+        [Persistent] public GUIWindow Window = GUIWindow.OPTIONS;
 
-        public Rect GUIPosition = new Rect(); 
+        public Rect GUIPosition = new Rect();
+ 
+
 
         public void UpdateFromGui(DangerAlertGUI gui)
             //Updates all the setting classes variables from a DangerAlertGUI's textbox values.
         {
-            Tolerance = gui.ToleranceBox;
-            MinimumVerticalSpeed = gui.MinimumVerticalSpeedBox;
-            MinimumSpeed = gui.MinimumSpeedBox;
             MasterVolume = gui.VolumeSlider;
             SoundToggle = gui.soundToggle;
+            Window = gui.Window;
 
             GUIPosition = gui.GetPosition();
         }
@@ -56,6 +57,8 @@ namespace DangerAlerts
                 ConfigNode.LoadObjectFromConfig(this, cnToLoad);
             }
         }
+
+        
 
         public void SaveCfg()
             //Saves all [Persistent] variables to the cfg, in filePath

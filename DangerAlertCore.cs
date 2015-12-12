@@ -1,4 +1,4 @@
-﻿// DangerAlerts v1.0.1: A KSP mod. Public domain, do whatever you want, man.
+﻿// DangerAlerts v1.1: A KSP mod. Public domain, do whatever you want, man.
 // Author: SpaceIsBig42/Norpo (same person)
 
 using System;
@@ -21,13 +21,11 @@ namespace DangerAlerts
 
         private bool inDanger = false;
 
-        public bool alarmActive = false;
+        public bool AlarmActive = false;
 
         private bool soundActive = true;
 
         public bool Paused = false;
-
-        private List<AlertBase> Alerts = new List<AlertBase>();
 
         void Start()
         {
@@ -42,7 +40,6 @@ namespace DangerAlerts
             GameEvents.onGamePause.Add(OnPause);
             GameEvents.onGameUnpause.Add(OnUnpause);
 
-            Alerts.Add(new CollisionAlert(7, 10, -2)); //TEMPORARY DEBUG ALL THAT GOOD STUFF REMOVE REPLACE ETC
         }
 
         void OnPause()
@@ -67,18 +64,17 @@ namespace DangerAlerts
             {
                 Vessel currentVessel = FlightGlobals.ActiveVessel;
                 soundActive = dangerAlertGui.soundToggle;
-                DangerAlertSettings.Instance.UpdateFromGui(dangerAlertGui);
 
                 soundplayer.SetVolume(DangerAlertSettings.Instance.MasterVolume);
 
                 inDanger = false;
-                foreach (AlertBase alert in Alerts)
+                foreach (AlertBase alert in DangerAlertList.Instance.AlertList)
                 {
-                    if (alert.Triggered(currentVessel))
+                    if (alert.Enabled && alert.Triggered(currentVessel))
                     {
-                        if (!alarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound
+                        if (!AlarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound
                         {
-                            alarmActive = true;
+                            AlarmActive = true;
                             dangerAlertGui.InDanger(true);
                         }
                         if (!soundplayer.SoundPlaying()) //If the sound isn't playing, play the sound.
@@ -95,9 +91,9 @@ namespace DangerAlerts
 
                 if (!inDanger)
                 {
-                    if (alarmActive)
+                    if (AlarmActive)
                     {
-                        alarmActive = false;
+                        AlarmActive = false;
                         dangerAlertGui.InDanger(false);
                         soundplayer.StopSound();
                     }
