@@ -37,6 +37,8 @@ namespace DangerAlerts
 
         string collisionMinimumVerticalSpeed = "-2";
 
+        bool collisionEnabled = true;
+
         private ApplicationLauncherButton dangerAlertButton;
         private Rect windowPosition = DangerAlertSettings.Instance.GUIPosition;
 
@@ -66,6 +68,7 @@ namespace DangerAlerts
             collisionTolerance = DangerAlertList.Instance.CollisionAlertList.First().Tolerance.ToString(); //that's a mouthful
             collisionMinimumSpeed = DangerAlertList.Instance.CollisionAlertList.First().MinimumSpeed.ToString();
             collisionMinimumVerticalSpeed = DangerAlertList.Instance.CollisionAlertList.First().MinimumVerticalSpeed.ToString();
+            collisionEnabled = DangerAlertList.Instance.CollisionAlertList.First().Enabled;
         }
 
         public void InDanger(bool danger)
@@ -161,6 +164,8 @@ namespace DangerAlerts
         void ShowCollisionGUI()
         {
 
+            GUILayout.BeginHorizontal(GUILayout.Width(550f));
+
             GUILayout.Label("Tolerance:");
 
             collisionTolerance = GUILayout.TextField(collisionTolerance, 3);
@@ -169,13 +174,21 @@ namespace DangerAlerts
 
             collisionMinimumSpeed = GUILayout.TextField(collisionMinimumSpeed, 3);
 
+            GUILayout.EndHorizontal();
+
+
+            GUILayout.BeginHorizontal(GUILayout.Width(550f));
+
             GUILayout.Label("Min Vertical Speed:");
 
             collisionMinimumVerticalSpeed = GUILayout.TextField(collisionMinimumVerticalSpeed, 3);
 
-            Debug.Log("1: collision, 2: total");
-            Debug.Log(DangerAlertList.Instance.CollisionAlertList.Count);
-            Debug.Log(DangerAlertList.Instance.AlertList.Count);
+            GUILayout.Label("Alarm Enabled");
+
+            collisionEnabled = GUILayout.Toggle(collisionEnabled, "");
+
+            GUILayout.EndHorizontal();
+
 
             CollisionAlert collisionAlert = DangerAlertList.Instance.CollisionAlertList.First();
 
@@ -184,6 +197,8 @@ namespace DangerAlerts
             collisionAlert.MinimumSpeed = Int32.Parse(collisionMinimumSpeed);
 
             collisionAlert.MinimumVerticalSpeed = Int32.Parse(collisionMinimumVerticalSpeed);
+
+            collisionAlert.Enabled = collisionEnabled;
 
             CollisionValueCheck();
 
@@ -238,7 +253,7 @@ namespace DangerAlerts
 
         void OnDestroy()
         {
-            //I don't even want to know why I wrote this, or when. Scared to remove it, though.
+            DangerAlertUtils.Log("DangerAlertGUI is being destroyed");
             ApplicationLauncher.Instance.RemoveModApplication(dangerAlertButton);
             DangerAlertList.Instance.SaveAlertsDat();
         }

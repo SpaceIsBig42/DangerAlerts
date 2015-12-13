@@ -12,9 +12,24 @@ namespace DangerAlerts
 {
     static class DangerAlertUtils
     {
+        static string tag = "[Danger Alerts] ";
+
         static public void Log(string message)
         {
+            message = tag + message;
             Debug.Log(message);
+        }
+
+        static public void LogError(string message)
+        {
+            message = tag + message;
+            Debug.LogError(message);
+        }
+
+        static public void LogWarning(string message)
+        {
+            message = tag + message;
+            Debug.LogWarning(message);
         }
     }
 }
