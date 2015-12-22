@@ -39,6 +39,8 @@ namespace DangerAlerts
 
         bool collisionEnabled = true;
 
+        int resourceIndex = 0;
+
         private ApplicationLauncherButton dangerAlertButton;
         private Rect windowPosition = DangerAlertSettings.Instance.GUIPosition;
 
@@ -117,9 +119,14 @@ namespace DangerAlerts
                     Window = GUIWindow.OPTIONS;
                 }
 
-                if (GUILayout.Button("Collision"))
+                else if (GUILayout.Button("Collision"))
                 {
                     Window = GUIWindow.COLLISION;
+                }
+
+                else if (GUILayout.Button("Resources"))
+                {
+                    Window = GUIWindow.RESOURCE;
                 }
 
                 GUILayout.EndHorizontal();
@@ -141,6 +148,10 @@ namespace DangerAlerts
 
                 case GUIWindow.COLLISION:
                     ShowCollisionGUI();
+                    break;
+                
+                case GUIWindow.RESOURCE:
+                    ShowResourceGUI();
                     break;
 
                 default:
@@ -170,6 +181,8 @@ namespace DangerAlerts
 
             collisionTolerance = GUILayout.TextField(collisionTolerance, 3);
 
+            GUILayout.Space(50f);
+
             GUILayout.Label("Min Speed:");
 
             collisionMinimumSpeed = GUILayout.TextField(collisionMinimumSpeed, 3);
@@ -182,6 +195,8 @@ namespace DangerAlerts
             GUILayout.Label("Min Vertical Speed:");
 
             collisionMinimumVerticalSpeed = GUILayout.TextField(collisionMinimumVerticalSpeed, 3);
+
+            GUILayout.Space(100f);
 
             GUILayout.Label("Alarm Enabled");
 
@@ -203,6 +218,69 @@ namespace DangerAlerts
             CollisionValueCheck();
 
         }
+
+        void ShowResourceGUI()
+        {
+            GUILayout.BeginHorizontal(GUILayout.Width(550f));
+
+            GUILayout.Space(100f);
+
+            if (resourceIndex != 0)
+            {
+                if (GUILayout.Button("<"))
+                {
+                    resourceIndex--;
+                }
+            }
+
+            GUILayout.Label("Alert (" + (resourceIndex + 1).ToString() + ")"); // The reason for the + 1 is because most people don't use zero index :)
+
+            if (resourceIndex < DangerAlertList.Instance.ResourceAlertList.Count)
+            {
+                if (GUILayout.Button(">"))
+                {
+                    DangerAlertUtils.Log("Boop!"); //TEMPORARY! TEMPORARY TEMPORARY TEMPORARY REMOVE TODO REMOVE
+                    resourceIndex++;
+                }
+            }
+
+            if (GUILayout.Button("Add"))
+            {
+                DangerAlertList.Instance.AddAlert(new ResourceAlert("ElectricCharge", 20));
+                if (DangerAlertList.Instance.ResourceAlertList.Count > 1)
+                {
+                    resourceIndex++;
+                }
+            }
+
+            if (DangerAlertList.Instance.ResourceAlertList.Count > 0)
+            {
+                if (GUILayout.Button("Remove"))
+                {
+                    DangerAlertList.Instance.RemoveAlert(DangerAlertList.Instance.ResourceAlertList[resourceIndex]);
+                }
+            }
+
+            GUILayout.Space(100f);
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal(GUILayout.Width(550f));
+
+            if (DangerAlertList.Instance.ResourceAlertList.Count == 0)
+            {
+                GUILayout.Label("There are currently no Resource Alerts.");
+                GUILayout.EndHorizontal();
+            }
+            else
+            {
+                // Add alert modifying code here
+                GUILayout.Label(DangerAlertList.Instance.ResourceAlertList[resourceIndex].ResourceString);
+                GUILayout.EndHorizontal();
+            }
+
+        }
+
         void CollisionValueCheck()
         {
             //Simple sanity check function, checks if the field is a possible value, if not, defaults to one.
