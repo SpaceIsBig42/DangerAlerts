@@ -21,7 +21,7 @@ namespace DangerAlerts
     {
         public AlertPriorities priority = AlertPriorities.CRITICAL;
 
-        public bool Enabled;
+        public bool Enabled = true;
 
         public abstract bool Triggered(Vessel currentVessel);
     }

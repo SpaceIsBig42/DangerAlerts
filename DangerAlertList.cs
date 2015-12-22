@@ -91,7 +91,7 @@ namespace DangerAlerts
 
         private void SetToDefault()
         {
-            DangerAlertUtils.Log("SetToDefault was run");
+            DangerAlertUtils.Log("Alerts being set to default; probably due to first start-up");
             AddAlert(new CollisionAlert(7, 10, -2));
         }
 

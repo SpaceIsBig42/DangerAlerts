@@ -13,12 +13,13 @@ namespace DangerAlerts
     {
 
         public string ResourceString;
-        public byte Percentage;
+        public int Percentage;
 
         public ResourceAlert(string resourceString, byte percentage)
         {
             ResourceString = resourceString;
             Percentage = percentage;
+            priority = AlertPriorities.HIGH;
         }
 
 

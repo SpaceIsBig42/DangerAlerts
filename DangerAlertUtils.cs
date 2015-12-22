@@ -12,6 +12,9 @@ namespace DangerAlerts
 {
     static class DangerAlertUtils
     {
+
+        static public string Version = "1.1";
+
         static string tag = "[Danger Alerts] ";
 
         static public void Log(string message)

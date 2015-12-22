@@ -60,45 +60,48 @@ namespace DangerAlerts
 
         void Update()
         {
-            if (HighLogic.LoadedSceneIsFlight && !Paused)
+            if (DangerAlertSettings.Instance.MasterToggle)
             {
-                Vessel currentVessel = FlightGlobals.ActiveVessel;
-                soundActive = dangerAlertGui.soundToggle;
-
-                soundplayer.SetVolume(DangerAlertSettings.Instance.MasterVolume);
-
-                inDanger = false;
-                foreach (AlertBase alert in DangerAlertList.Instance.AlertList)
+                if (HighLogic.LoadedSceneIsFlight && !Paused)
                 {
-                    if (alert.Enabled && alert.Triggered(currentVessel))
+                    Vessel currentVessel = FlightGlobals.ActiveVessel;
+                    soundActive = dangerAlertGui.soundToggle;
+
+                    soundplayer.SetVolume(DangerAlertSettings.Instance.MasterVolume);
+
+                    inDanger = false;
+                    foreach (AlertBase alert in DangerAlertList.Instance.AlertList)
                     {
-                        if (!AlarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound
+                        if (alert.Enabled && alert.Triggered(currentVessel))
                         {
-                            AlarmActive = true;
-                            dangerAlertGui.InDanger(true);
-                        }
-                        if (!soundplayer.SoundPlaying()) //If the sound isn't playing, play the sound.
-                        {
-                            if (soundActive)
+                            if (!AlarmActive) //alarmActive is to make it so the plugin doesn't keep spamming sound
                             {
-                                soundplayer.PlaySound(); //Plays sound
+                                AlarmActive = true;
+                                dangerAlertGui.InDanger(true);
                             }
+                            if (!soundplayer.SoundPlaying()) //If the sound isn't playing, play the sound.
+                            {
+                                if (soundActive)
+                                {
+                                    soundplayer.PlaySound(); //Plays sound
+                                }
+                            }
+
+                            inDanger = true;
                         }
-
-                        inDanger = true;
                     }
-                }
 
-                if (!inDanger)
-                {
-                    if (AlarmActive)
+                    if (!inDanger)
                     {
-                        AlarmActive = false;
-                        dangerAlertGui.InDanger(false);
-                        soundplayer.StopSound();
+                        if (AlarmActive)
+                        {
+                            AlarmActive = false;
+                            dangerAlertGui.InDanger(false);
+                            soundplayer.StopSound();
+                        }
                     }
-                }
 
+                }
             }
         }
 
