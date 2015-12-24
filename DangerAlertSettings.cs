@@ -1,4 +1,4 @@
-﻿// DangerAlerts v1.0.1: A KSP mod. Public domain, do whatever you want, man.
+﻿// DangerAlerts v1.1: A KSP mod. Public domain, do whatever you want, man.
 // Author: SpaceIsBig42/Norpo (same person)
 
 using System;
@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using KSP;
+
 
 namespace DangerAlerts
 {
@@ -25,24 +26,30 @@ namespace DangerAlerts
             }
         }
 
-        protected string filePath = KSPUtil.ApplicationRootPath + "GameData/DangerAlerts/options.cfg"; //File path
+
+
+        private string optionFilePath = KSPUtil.ApplicationRootPath + "GameData/DangerAlerts/options.cfg"; //File path
+
+        public bool MasterToggle = true; //Master toggle shouldn't be persistent, wouldn't want people turning it off, then filing
+                                         //a bug report :)
 
         [Persistent] public bool SoundToggle = true;
-        [Persistent] public int Tolerance = 7;
-        [Persistent] public int MinimumVerticalSpeed = -3;
-        [Persistent] public int MinimumSpeed = 10;
         [Persistent] public float MasterVolume = 0.5f;
+        [Persistent] public GUIWindow Window = GUIWindow.OPTIONS;
 
-        public Rect GUIPosition = new Rect(); 
+        [Persistent] private string cfgVersionLoaded = DangerAlertUtils.Version;
+
+        public Rect GUIPosition = new Rect();
+ 
+
 
         public void UpdateFromGui(DangerAlertGUI gui)
             //Updates all the setting classes variables from a DangerAlertGUI's textbox values.
         {
-            Tolerance = gui.ToleranceBox;
-            MinimumVerticalSpeed = gui.MinimumVerticalSpeedBox;
-            MinimumSpeed = gui.MinimumSpeedBox;
+            MasterToggle = gui.masterToggle;
             MasterVolume = gui.VolumeSlider;
             SoundToggle = gui.soundToggle;
+            Window = gui.Window;
 
             GUIPosition = gui.GetPosition();
         }
@@ -50,18 +57,30 @@ namespace DangerAlerts
         public void UpdateFromCfg()
             //Loads in values from filePath's file.
         {
-            if (System.IO.File.Exists(filePath))
+            if (System.IO.File.Exists(optionFilePath))
             {
-                ConfigNode cnToLoad = ConfigNode.Load(filePath);
+                ConfigNode cnToLoad = ConfigNode.Load(optionFilePath);
                 ConfigNode.LoadObjectFromConfig(this, cnToLoad);
             }
+            else
+            {
+                DangerAlertUtils.Log("Options file does not exist; using defaults instead");
+            }
         }
+
+        
 
         public void SaveCfg()
             //Saves all [Persistent] variables to the cfg, in filePath
         {
+            string tempVersionLoaded = cfgVersionLoaded;
+
+            cfgVersionLoaded = DangerAlertUtils.Version;
+
             ConfigNode cnTemp = ConfigNode.CreateConfigFromObject(this, new ConfigNode());
-            cnTemp.Save(filePath);
+            cnTemp.Save(optionFilePath);
+
+            cfgVersionLoaded = tempVersionLoaded;
         }
     }
 }
