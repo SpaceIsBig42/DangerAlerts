@@ -11,8 +11,6 @@ CHANGELOG:
 Completely overhauled GUI.
 Added "Resource Alerts", customizable alerts that go off when a specified resource is below a certain percentage.
 
-Fixed potential bug where the alerts may not be enabled by default.
-
 1.0.1:
 
 Added Master Volume control.
