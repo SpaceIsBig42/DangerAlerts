@@ -1,10 +1,14 @@
-Danger Alerts version 1.1. A mod for Kerbal Space Program, compatible with KSP version 1.0.5.
-Made by Norpo; Public Domain.
+Danger Alerts version 1.2. (DEV) A mod for Kerbal Space Program, compatible with KSP version 1.0.5.
+Made by Norpo; Released under the MIT license; see LICENSE.txt for details.
 
 Danger Alerts adds alerts, when you're in danger, a sound starts playing. This can help you
 with landing.
 
 CHANGELOG:
+
+1.2 (in development):
+
+Changed license to MIT.
 
 1.1:
 

@@ -1,4 +1,5 @@
-﻿// DangerAlerts v1.1: A KSP mod. Public domain, do whatever you want, man.
+﻿// DangerAlerts v1.2: A KSP mod. Released under the MIT license; 
+// see LICENSE.txt for details.
 // Author: SpaceIsBig42/Norpo (same person)
 
 
